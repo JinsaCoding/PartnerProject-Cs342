@@ -1,0 +1,128 @@
+		private int checkDiagonalBottomLeft(int currRow, int currColumn, char piece, int pieceCount){
+			pieceCount = 1;
+			if (board[currRow - 1][currColumn - 1] == piece && currRow - 1 >= 0 && currColumn - 1 >= 0) {
+				pieceCount++;
+			}
+			if (board[currRow - 1][currColumn - 1] == piece && board[currRow - 2][currColumn - 2] == piece && currRow - 2 >= 0
+					&& currColumn - 2 >= 0) {
+				pieceCount ++;
+			}
+			if (board[currRow - 1][currColumn - 1] == piece && board[currRow - 2][currColumn - 2] == piece &&
+						board[currRow - 3][currColumn - 3] == piece && currRow - 3 >= 0 && currColumn - 3 >= 0) {
+				pieceCount++;
+			}
+			return pieceCount;
+
+		}
+		private int checkDiagonalTopRight(int currRow, int currColumn, char piece, int pieceCount){
+			pieceCount = 1;
+			if (board[currRow + 1][currColumn + 1] == piece && currRow + 1 <= 6 && currColumn + 1 <= 6) {
+				pieceCount++;
+			}
+			if (board[currRow + 1][currColumn + 1] == piece && board[currRow + 2][currColumn + 2] == piece
+			&& currRow + 2 <= 6 && currColumn + 2 <= 6) {
+				pieceCount ++;
+			}
+			if (board[currRow + 1][currColumn + 1] == piece && board[currRow + 2][currColumn + 2] == piece
+					&& board[currRow + 3][currColumn + 3] == piece && currRow + 3 <= 6 && currColumn + 3 <= 6) {
+				pieceCount++;
+			}
+			return pieceCount;
+		}
+		private int checkDiagonalTopLeft(int currRow, int currColumn, char piece, int pieceCount){
+			pieceCount = 1;
+			if (board[currRow + 1][currColumn - 1] == piece && currRow + 1 <= 6 && currColumn - 1 >= 0) {
+				pieceCount++;
+			}
+			if (board[currRow + 1][currColumn - 1] == piece && board[currRow - 2][currColumn - 2] == piece && currRow - 2 >= 0
+					&& currColumn - 2 >= 0) {
+				pieceCount ++;
+			}
+			if (board[currRow - 1][currColumn - 1] == piece && board[currRow - 2][currColumn - 2] == piece &&
+					board[currRow - 3][currColumn - 3] == piece && currRow - 3 >= 0 && currColumn - 3 >= 0) {
+				pieceCount++;
+			}
+			return pieceCount;
+
+		}
+		private int checkDiagonalBottomRight(int currRow, int currColumn, char piece, int pieceCount){
+			pieceCount = 1;
+			if (board[currRow - 1][currColumn + 1] == piece && currRow - 1 >= 0 && currColumn + 1 <= 6) {
+				pieceCount++;
+			}
+			if (board[currRow - 1][currColumn + 1] == piece && board[currRow - 2][currColumn + 2] == piece && currRow - 2 >= 0
+					&& currColumn + 2 <= 6) {
+				pieceCount ++;
+			}
+			if (board[currRow - 1][currColumn + 1] == piece && board[currRow - 2][currColumn + 2] == piece &&
+					board[currRow - 3][currColumn + 3] == piece && currRow - 3 >= 0 && currColumn + 3 <= 6) {
+				pieceCount++;
+			}
+			return pieceCount;
+
+		}
+		private int checkBottom(int currRow, int currColumn, char piece, int pieceCount){
+			pieceCount = 1;
+			if (board[currRow + 1][currColumn] == piece && currRow + 1 <= 6){
+				pieceCount++;
+			}
+			if (board[currRow + 1][currColumn] == piece && board[currRow + 2][currColumn] == piece && currRow + 2 <= 6){
+				pieceCount++;
+			}
+			if(board[currRow + 1][currColumn] == piece && board[currRow + 2][currColumn] == piece &&
+			board[currRow + 3][currColumn] == piece && currRow + 3 <= 6){
+				pieceCount++;
+			}
+			return pieceCount;
+		}
+		private boolean checkForWin(int currRow, int currColumn, char piece) {
+			int count = 0;
+			int bottom = checkBottom(currRow, currColumn, piece, count);
+			int bottomLeft = checkDiagonalBottomLeft(currRow, currColumn, piece, count);
+			int bottomRight = checkDiagonalBottomRight(currRow, currColumn, piece, count);
+			int topLeft = checkDiagonalTopLeft(currRow, currColumn, piece, count);
+			int topRight = checkDiagonalTopRight(currRow, currColumn, piece, count);
+
+			if(bottom + bottomLeft + bottomRight + topLeft + topRight >= 4){
+				return true;
+			}
+			return false;
+		}
+
+		private boolean makeMove(int column, boolean isRed) {
+
+			//Starts from, bottom and finds first available open space
+			for (int row = 6; row >= 0; row--) {
+				if (board[row][column] == 'x') {
+					//Places respective piece based on turn
+					if (redTurn) {
+						board[row][column] = 'r';
+						if(checkForWin(row, column, 'r')){
+							try{
+							black.out.writeObject(new Message("Red got 4 in a row and won.", MessageType.TEXT));
+							red.out.writeObject(new Message("You won!"));
+							}catch(IOException e){
+								System.err.println("MakeMove error");
+							}
+							return true;
+						}
+					} else {
+						board[row][column] = 'b';
+						if (checkForWin(row, column, 'b')){
+							try{
+								black.out.writeObject(new Message("You won!", MessageType.TEXT));
+								red.out.writeObject(new Message("Black got 4 in a row and won."));
+							}catch(IOException e){
+								System.err.println("MakeMove error");
+							}
+							return true;
+						}
+					}
+					//Switch turn and return true
+					redTurn = !redTurn;
+					return true;
+				}
+			}
+			//Otherwise the column is full
+			return false;
+		}
